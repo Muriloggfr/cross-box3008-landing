@@ -783,8 +783,10 @@
     transition: opacity 0.25s ease, transform 0.2s ease;
     pointer-events: none;
   }
-  .video-native.playing .vp-play-native { opacity: 0; }
-  .video-native:hover.playing .vp-play-native { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  .video-native.playing .vp-play-native { opacity: 0; pointer-events: none; }
+  @media (hover: hover) {
+    .video-native:hover.playing .vp-play-native { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  }
 
   /* ─── Shimmer sweep text ──────────────────────────────── */
   @keyframes text-shimmer {
@@ -1591,7 +1593,7 @@
       <!-- Soraya -->
       <div class="video-card">
         <div class="video-wrapper video-native">
-          <video src="video/coach-soraya-box3008-crossfit-ribeirao-preto.mp4" loop playsinline preload="metadata" class="vp-video"></video>
+          <video src="video/coach-soraya-box3008-crossfit-ribeirao-preto.mp4" loop playsinline preload="metadata" poster="img/poster-soraya.jpg" class="vp-video"></video>
           <div class="vp-overlay">
             <span class="vp-role">Recepcionista</span>
             <h3 class="vp-name">Soraya</h3>
@@ -1606,7 +1608,7 @@
       <!-- João Paulo -->
       <div class="video-card">
         <div class="video-wrapper video-native">
-          <video src="video/coach-joao-paulo-box3008-crossfit-ribeirao-preto.mp4" loop playsinline preload="metadata" class="vp-video"></video>
+          <video src="video/coach-joao-paulo-box3008-crossfit-ribeirao-preto.mp4" loop playsinline preload="metadata" poster="img/poster-joaopaulo.jpg" class="vp-video"></video>
           <div class="vp-overlay">
             <span class="vp-role">Coach</span>
             <h3 class="vp-name">João Paulo</h3>
@@ -1621,7 +1623,7 @@
       <!-- Adeline -->
       <div class="video-card">
         <div class="video-wrapper video-native">
-          <video src="video/coach-adeline-box3008-crossfit-ribeirao-preto.mp4" loop playsinline preload="metadata" class="vp-video"></video>
+          <video src="video/coach-adeline-box3008-crossfit-ribeirao-preto.mp4" loop playsinline preload="metadata" poster="img/poster-adeline.jpg" class="vp-video"></video>
           <div class="vp-overlay">
             <span class="vp-role">Coach</span>
             <h3 class="vp-name">Adeline</h3>
@@ -2104,10 +2106,26 @@ if (marqueeWraps[1]) initMarquee(marqueeWraps[1], 0.4, false);
 // ── Team — vídeos nativos (play/pause ao clicar) ──────
 document.querySelectorAll('.video-native').forEach(wrapper => {
   const video = wrapper.querySelector('.vp-video');
+  const btn   = wrapper.querySelector('.vp-play-native');
+
+  function setPlaying(playing) {
+    if (playing) {
+      wrapper.classList.add('playing');
+      if (btn) btn.style.opacity = '0';
+    } else {
+      wrapper.classList.remove('playing');
+      if (btn) btn.style.opacity = '';
+    }
+  }
+
   wrapper.addEventListener('click', () => {
-    if (video.paused) { video.play(); wrapper.classList.add('playing'); }
-    else { video.pause(); wrapper.classList.remove('playing'); }
+    if (video.paused) { video.play(); setPlaying(true); }
+    else              { video.pause(); setPlaying(false); }
   });
+
+  // Garante que o botão some/aparece via eventos do próprio vídeo
+  video.addEventListener('play',  () => setPlaying(true));
+  video.addEventListener('pause', () => setPlaying(false));
 });
 
 // ── Team — carrega vídeo YouTube ao clicar ────────────
